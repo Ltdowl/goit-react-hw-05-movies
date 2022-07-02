@@ -17,11 +17,12 @@ const Review = lazy(() =>
 );
 
 export default function MovieDetailsView() {
-  const { pathname } = useLocation();
   const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
   const BASE_IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
   const navigate = useNavigate();
+  const location = useLocation();
+  const backLink = location?.state?.from ?? '/';
 
   useEffect(() => {
     movieApi.fetchMovieDetails(movieId).then(setMovie);
@@ -30,15 +31,9 @@ export default function MovieDetailsView() {
   return (
     movie && (
       <>
-        <button
-          className={s.back_btn}
-          onClick={() => {
-            const prevRoute = window.sessionStorage.getItem('prevRoute');
-            navigate(prevRoute ?? '/');
-          }}
-        >
+        <Link to={backLink} className={s.back_link}>
           &#8592; Go back
-        </button>
+        </Link>
         <div className={s.movie_container}>
           <div className={s.photo_container}>
             <img
@@ -61,12 +56,12 @@ export default function MovieDetailsView() {
           <p>Additional information:</p>
           <ul>
             <li>
-              <Link to={pathname.split('/').slice(0, 3).join('/') + '/cast'}>
+              <Link to="cast" state={location.state}>
                 Cast
               </Link>
             </li>
             <li>
-              <Link to={pathname.split('/').slice(0, 3).join('/') + '/reviews'}>
+              <Link to="reviews" state={location.state}>
                 Reviews
               </Link>
             </li>

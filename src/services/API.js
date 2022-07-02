@@ -1,21 +1,23 @@
+import { Navigate } from 'react-router-dom';
 const API_KEY = '12e65dbf8f6231388c10338e98f45dbb';
 
 async function fetchWithErrorHandling(url = '', config = {}) {
-    const response = await fetch(url, config);
-    return response.ok
-        ? await response.json()
-        : Promise.reject(new Error('Not found'));
+  const response = await fetch(url, config);
+  return response.ok
+    ? await response.json()
+    : Promise.reject(new Error('Not found'));
 }
 
 export function fetchTrending() {
-    return fetchWithErrorHandling(
-        `https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}`);
+  return fetchWithErrorHandling(
+    `https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}`
+  );
 }
 
 export function fetchMovieDetails(movieId) {
-    return fetchWithErrorHandling(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-US`);
-   
+  return fetchWithErrorHandling(
+    `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-US`
+  );
 }
 
 export function fetchMovieCredits(movieId) {
