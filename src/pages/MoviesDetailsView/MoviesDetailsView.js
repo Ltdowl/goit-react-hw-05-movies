@@ -2,12 +2,12 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import {
   useParams,
   useLocation,
-  useNavigate,
   Link,
   Routes,
   Route,
+  useNavigate,
 } from 'react-router-dom';
-import * as movieApi from '../../services/API';
+import { fetchMovieDetails } from '../../services/API';
 import s from './MovieDetailsView.module.css';
 const Cast = lazy(() =>
   import('../Cast/Cast' /* webpackChunkName: "cast-view" */)
@@ -19,13 +19,24 @@ const Review = lazy(() =>
 export default function MovieDetailsView() {
   const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
+
+
   const BASE_IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
-  const navigate = useNavigate();
   const location = useLocation();
   const backLink = location?.state?.from ?? '/';
-
+  const navigate = useNavigate();
   useEffect(() => {
-    movieApi.fetchMovieDetails(movieId).then(setMovie);
+    async function fetchFilm() {
+      try {
+        const getFilmDetails = await fetchMovieDetails(movieId);
+        setMovie(getFilmDetails);
+      } catch (error) {
+        // alert('Page not found');
+        navigate('/');
+      } finally {
+      }
+    }
+    fetchFilm();
   }, [movieId]);
 
   return (
@@ -34,6 +45,7 @@ export default function MovieDetailsView() {
         <Link to={backLink} className={s.back_link}>
           &#8592; Go back
         </Link>
+
         <div className={s.movie_container}>
           <div className={s.photo_container}>
             <img
