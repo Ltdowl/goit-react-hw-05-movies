@@ -1,4 +1,3 @@
-import { Navigate } from 'react-router-dom';
 const API_KEY = '12e65dbf8f6231388c10338e98f45dbb';
 
 async function fetchWithErrorHandling(url = '', config = {}) {
