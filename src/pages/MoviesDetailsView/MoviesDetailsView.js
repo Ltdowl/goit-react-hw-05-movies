@@ -16,28 +16,26 @@ const Review = lazy(() =>
   import('../Reviews/Reviews' /* webpackChunkName: "review-view" */)
 );
 
+const BASE_IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
+
 export default function MovieDetailsView() {
   const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
-
-
-  const BASE_IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
   const location = useLocation();
-  const backLink = location?.state?.from ?? '/';
   const navigate = useNavigate();
+  const backLink = location?.state?.from ?? '/';
+
   useEffect(() => {
-    async function fetchFilm() {
+    (async function getMovie() {
       try {
-        const getFilmDetails = await fetchMovieDetails(movieId);
-        setMovie(getFilmDetails);
+        const movie = await fetchMovieDetails(movieId);
+        setMovie(movie);
       } catch (error) {
-        // alert('Page not found');
-        navigate('/');
-      } finally {
+        navigate('/', { replace: true });
+        console.log(error);
       }
-    }
-    fetchFilm();
-  }, [movieId]);
+    })();
+  }, [movieId, navigate]);
 
   return (
     movie && (
