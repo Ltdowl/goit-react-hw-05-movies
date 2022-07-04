@@ -1,50 +1,45 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { fetchSearchMovie } from '../../services/API';
 import MoviesLinkList from '../../components/MoviesLinkList/MoviesLinkList';
 
 export default function MoviesView() {
   const [movies, setMovies] = useState(null);
-  const navigate = useNavigate();
-  const { pathname, search } = useLocation();
+  const [query, setQuery] = useState('');
 
-  let searchQuery = null;
-
-  const setSearchQueryToValue = () => {
-    const prevRoute = window.sessionStorage.getItem('prevRoute');
-    if (prevRoute.includes('search')) {
-      searchQuery = prevRoute.slice(15);
-    }
-  };
-
-  setSearchQueryToValue();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const curentPos = searchParams.get('query');
 
   useEffect(() => {
-    const query = search.slice(8);
-    if (!query) {
-      return;
-    }
-    fetchSearchMovie(query).then(setMovies);
-  }, [search]);
+    if (!curentPos) return;
+    fetchSearchMovie(curentPos)
+      .then(data => {
+        if (data.length === 0) {
+          setSearchParams({});
+          return;
+        }
+        setMovies(data);
+      })
+      .catch(error => console.error(error));
+  }, [curentPos, setSearchParams]);
 
   const handleSubmit = e => {
     e.preventDefault();
-    const query = e.currentTarget.elements.query.value.trim();
-    if (!query) {
+    if (query.trim() === '') {
+      console.log('Enter the text');
       return;
     }
-    navigate(`${pathname}?search=${query}`);
-    window.sessionStorage.setItem('prevRoute', `${pathname}?search=${query}`);
+    setSearchParams({ query: query.trim() });
+  };
+  const handelInputChange = e => {
+    const text = e.currentTarget.value.toLowerCase();
+    setQuery(text);
   };
 
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <input
-          name="query"
-          defaultValue={searchQuery ?? ''}
-          type="text"
-        ></input>
+        <input name={query} onChange={handelInputChange} type="text"></input>
         <input type="submit" value="Search" />
       </form>
       {movies && <MoviesLinkList data={movies.results} />}
